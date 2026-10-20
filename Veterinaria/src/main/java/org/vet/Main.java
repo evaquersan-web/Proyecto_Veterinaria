@@ -9,7 +9,7 @@ public class Main {
         try (Connection conexion = ConexionBD.conectar()) {
 
             System.out.println(
-                    "Conexion con VetCare realizada correctamente."
+                    "Conexion con la base de datos realizada correctamente."
             );
 
         } catch (SQLException e) {
