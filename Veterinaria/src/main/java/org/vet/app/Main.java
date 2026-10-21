@@ -1,4 +1,4 @@
-package org.vet;
+package org.vet.app;
 
 import org.vet.util.ConexionBD;
 import java.sql.Connection;
