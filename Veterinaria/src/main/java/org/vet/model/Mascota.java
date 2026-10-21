@@ -1,19 +1,20 @@
 package org.vet.model;
 
 import java.time.LocalDate;
+import java.sql.Date;
 
 public class Mascota {
     private int id;
     private String nombre;
     private String especie;
     private String raza;
-    private LocalDate fechaNacimiento;
+    private Date fechaNacimiento;
     private int idCliente;
 
     public Mascota() {
     }
 
-    public Mascota(String nombre, String especie, String raza, LocalDate fechaNacimiento, int idCliente) {
+    public Mascota(String nombre, String especie, String raza, Date fechaNacimiento, int idCliente) {
         this.nombre = nombre;
         this.especie = especie;
         this.raza = raza;
@@ -21,7 +22,7 @@ public class Mascota {
         this.idCliente = idCliente;
     }
 
-    public Mascota(int id, String nombre, String especie, String raza, LocalDate fechaNacimiento, int idCliente) {
+    public Mascota(int id, String nombre, String especie, String raza, Date fechaNacimiento, int idCliente) {
         this.id = id;
         this.nombre = nombre;
         this.especie = especie;
@@ -42,8 +43,8 @@ public class Mascota {
     public String getRaza() { return raza; }
     public void setRaza(String raza) { this.raza = raza; }
 
-    public LocalDate getFechaNacimiento() { return fechaNacimiento; }
-    public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
+    public Date getFechaNacimiento() { return fechaNacimiento; }
+    public void setFechaNacimiento(Date fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
 
     public int getIdCliente() { return idCliente; }
     public void setIdCliente(int idCliente) { this.idCliente = idCliente; }

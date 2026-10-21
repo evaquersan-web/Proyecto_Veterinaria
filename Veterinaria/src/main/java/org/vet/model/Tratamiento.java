@@ -9,11 +9,11 @@ public class Tratamiento {
     private double coste;
     private int idMascota;
 
-    // Constructor vacío para el DAO
+
     public Tratamiento() {
     }
 
-    // Constructor sin ID para registrar nuevos tratamientos
+
     public Tratamiento(LocalDate fecha, String descripcion, double coste, int idMascota) {
         this.fecha = fecha;
         this.descripcion = descripcion;
@@ -21,7 +21,7 @@ public class Tratamiento {
         this.idMascota = idMascota;
     }
 
-    // Constructor completo
+
     public Tratamiento(int id, LocalDate fecha, String descripcion, double coste, int idMascota) {
         this.id = id;
         this.fecha = fecha;
@@ -30,7 +30,7 @@ public class Tratamiento {
         this.idMascota = idMascota;
     }
 
-    // Getters y Setters
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
