@@ -21,4 +21,9 @@ public class Cliente {
     public String getNombre() { return nombre; }
     public String getTelefono() { return telefono; }
     public String getEmail() { return email; }
+
+    public void setDni(String dni) { }
+    public void setNombre(String nombre) { }
+    public void setTelefono(String telefono) { }
+    public void setEmail(String email) { }
 }

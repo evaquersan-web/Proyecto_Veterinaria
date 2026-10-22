@@ -26,4 +26,17 @@ public class ClienteDAO {
             return false;
         }
     }
+
+    public boolean insertarCliente(String dni, String nombre,
+                                   String telefono, String email) {
+
+        Cliente cliente = new Cliente(dni,nombre,telefono,email);
+
+        cliente.setDni(dni);
+        cliente.setNombre(nombre);
+        cliente.setTelefono(telefono);
+        cliente.setEmail(email);
+
+        return insertarCliente(cliente);
+    }
 }
