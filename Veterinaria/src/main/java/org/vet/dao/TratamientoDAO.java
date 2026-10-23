@@ -17,7 +17,7 @@ public class TratamientoDAO {
         try (Connection conn = ConexionBD.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setDate(1, Date.valueOf(tratamiento.getFecha()));
+            stmt.setDate(1, (Date) tratamiento.getFecha());
             stmt.setString(2, tratamiento.getDescripcion());
             stmt.setDouble(3, tratamiento.getCoste());
             stmt.setInt(4, tratamiento.getIdMascota());
@@ -50,7 +50,7 @@ public class TratamientoDAO {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     int id = rs.getInt("ID");
-                    LocalDate fecha = rs.getDate("Fecha").toLocalDate();
+                    Date fecha = rs.getDate("Fecha");
                     String descripcion = rs.getString("Descripcion");
                     double coste = rs.getDouble("Coste");
                     int idMasco = rs.getInt("ID_Mascota");

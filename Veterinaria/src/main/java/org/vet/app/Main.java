@@ -2,7 +2,9 @@
 package org.vet.app;
 
 import org.vet.dao.MascotaDAO;
+import org.vet.dao.TratamientoDAO;
 import org.vet.model.Mascota;
+import org.vet.model.Tratamiento;
 import org.vet.util.ConexionBD;
 import org.vet.dao.ClienteDAO;
 
@@ -11,7 +13,9 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Formatter;
+import java.util.Locale;
 import java.util.Scanner;
 
 public class Main {
@@ -89,6 +93,29 @@ public class Main {
                 Mascota mascota = new Mascota(nombre, especie, raza, fecha, nombreCliente);
 
                 mascotaDAO.insertarMascota(mascota);
+            }
+
+            if (eleccion == 3){
+
+                TratamientoDAO tratamientoDAO = new TratamientoDAO();
+
+                System.out.println("Fecha del tratamiento (formato DD/MM/YYYY): ");
+                String fecha = sc.next();
+                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+                format.setLenient(false);
+                Date fechaTratamiento = (Date) format.parse(fecha);
+
+                System.out.println("Descripción: ");
+                String descripcion = sc.next();
+
+                System.out.println("Coste: ");
+                int coste = sc.nextInt();
+
+                System.out.println("Id de la mascota");
+                int idMasc = sc.nextInt();
+
+                Tratamiento tratamiento = new Tratamiento(fechaTratamiento, descripcion, coste, idMasc);
+                tratamientoDAO.registrarTratamiento(tratamiento);
             }
 
             if (eleccion == 4){

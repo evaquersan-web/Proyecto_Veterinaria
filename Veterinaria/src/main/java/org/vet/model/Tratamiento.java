@@ -1,10 +1,11 @@
 package org.vet.model;
 
 import java.time.LocalDate;
+import java.util.Date;
 
 public class Tratamiento {
     private int id;
-    private LocalDate fecha;
+    private Date fecha;
     private String descripcion;
     private double coste;
     private int idMascota;
@@ -14,7 +15,7 @@ public class Tratamiento {
     }
 
 
-    public Tratamiento(LocalDate fecha, String descripcion, double coste, int idMascota) {
+    public Tratamiento(Date fecha, String descripcion, double coste, int idMascota) {
         this.fecha = fecha;
         this.descripcion = descripcion;
         this.coste = coste;
@@ -22,7 +23,7 @@ public class Tratamiento {
     }
 
 
-    public Tratamiento(int id, LocalDate fecha, String descripcion, double coste, int idMascota) {
+    public Tratamiento(int id, Date fecha, String descripcion, double coste, int idMascota) {
         this.id = id;
         this.fecha = fecha;
         this.descripcion = descripcion;
@@ -34,8 +35,8 @@ public class Tratamiento {
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
-    public LocalDate getFecha() { return fecha; }
-    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public Date getFecha() { return fecha; }
+    public void setFecha(Date fecha) { this.fecha = fecha; }
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
