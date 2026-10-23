@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class ConexionBD {
 
-    private static final String URL = "jdbc:mysql://localhost:3308/vet";
+    private static final String URL = "jdbc:mysql://localhost:3308/vetcare_db";
 
     private static final String USUARIO = "root";
 
