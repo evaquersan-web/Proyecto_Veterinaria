@@ -1,0 +1,20 @@
+========================================
+          CLINICA VETERINARIA VETCARE   
+========================================
+Num. Factura: 3
+Fecha:        2026-10-25
+----------------------------------------
+DATOS DEL CLIENTE:
+Nombre:   Mikel
+DNI:      73464449B
+Telefono: 617815287
+----------------------------------------
+DATOS DE LA MASCOTA:
+Nombre:  Max
+Especie: Perro
+Raza:    Huskie
+----------------------------------------
+DETALLE DEL TRATAMIENTO:
+Descripcion: Revision
+Importe Total: 100,00 EUR
+========================================

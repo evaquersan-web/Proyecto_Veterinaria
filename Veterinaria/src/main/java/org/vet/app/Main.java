@@ -111,7 +111,6 @@ public class Main {
                 nuevoTratamiento.setId(idTratamiento);
                 System.out.println("Tratamiento registrado con ID: " + idTratamiento);
 
-                // Obtener datos para la factura
                 Mascota mascota = mascotaDAO.obtenerMascotaPorId(idMascota);
                 if (mascota != null) {
                     Cliente cliente = clienteDAO.obtenerClientePorId(mascota.getIdCliente());
@@ -120,7 +119,6 @@ public class Main {
                             File facturaLocal = FacturaService.generarFacturaTxt(nuevoTratamiento, mascota, cliente);
                             System.out.println("\n[ACDA] Factura generada: " + facturaLocal.getName());
 
-                            // Subida programática al servidor FTP
                             String carpetaRemota = "facturas";
                             boolean subidaCorrecta = ftpManager.subirFactura(facturaLocal, carpetaRemota);
 
