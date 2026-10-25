@@ -4,65 +4,60 @@ import org.vet.model.Tratamiento;
 import org.vet.util.ConexionBD;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TratamientoDAO {
 
-    public int registrarTratamiento(Tratamiento tratamiento) {
-        String sql = "INSERT INTO tratamientos (Fecha, Descripcion, Coste, ID_Mascota) VALUES (?, ?, ?, ?)";
-        int idGenerado = -1;
+    public int insertarTratamiento(Tratamiento tratamiento) {
+        String sql = "INSERT INTO Tratamientos (Fecha, Descripcion, Coste, ID_Mascota) VALUES (?, ?, ?, ?)";
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-        try (Connection conn = ConexionBD.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setDate(1, (Date) tratamiento.getFecha());
+            ps.setString(2, tratamiento.getDescripcion());
+            ps.setDouble(3, tratamiento.getCoste());
+            ps.setInt(4, tratamiento.getIdMascota());
 
-            stmt.setDate(1, (Date) tratamiento.getFecha());
-            stmt.setString(2, tratamiento.getDescripcion());
-            stmt.setDouble(3, tratamiento.getCoste());
-            stmt.setInt(4, tratamiento.getIdMascota());
-
-            int filasAfectadas = stmt.executeUpdate();
-            if (filasAfectadas > 0) {
-                try (ResultSet rs = stmt.getGeneratedKeys()) {
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) {
-                        idGenerado = rs.getInt(1);
+                        int idGenerado = rs.getInt(1);
                         tratamiento.setId(idGenerado);
-                        System.out.println("Tratamiento registrado correctamente con ID: " + idGenerado);
+                        return idGenerado;
                     }
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al registrar el tratamiento: " + e.getMessage());
+            System.err.println("Error al insertar tratamiento: " + e.getMessage());
         }
-        return idGenerado;
+        return -1;
     }
 
-
     public List<Tratamiento> obtenerTratamientosPorMascota(int idMascota) {
-        List<Tratamiento> listaTratamientos = new ArrayList<>();
-        String sql = "SELECT ID, Fecha, Descripcion, Coste, ID_Mascota FROM tratamientos WHERE ID_Mascota = ?";
+        List<Tratamiento> lista = new ArrayList<>();
+        String sql = "SELECT ID_Tratamiento, Fecha, Descripcion, Coste, ID_Mascota FROM Tratamientos WHERE ID_Mascota = ? ORDER BY Fecha DESC";
 
-        try (Connection conn = ConexionBD.conectar();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection con = ConexionBD.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            stmt.setInt(1, idMascota);
-            try (ResultSet rs = stmt.executeQuery()) {
+            ps.setInt(1, idMascota);
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    int id = rs.getInt("ID");
-                    Date fecha = rs.getDate("Fecha");
-                    String descripcion = rs.getString("Descripcion");
-                    double coste = rs.getDouble("Coste");
-                    int idMasco = rs.getInt("ID_Mascota");
-
-                    Tratamiento tratamiento = new Tratamiento(id, fecha, descripcion, coste, idMasco);
-                    listaTratamientos.add(tratamiento);
+                    Tratamiento tratamiento = new Tratamiento(
+                            rs.getDate("Fecha"),
+                            rs.getString("Descripcion"),
+                            rs.getDouble("Coste"),
+                            rs.getInt("ID_Mascota")
+                    );
+                    tratamiento.setId(rs.getInt("ID_Tratamiento"));
+                    lista.add(tratamiento);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error al consultar el historial de tratamientos: " + e.getMessage());
+            System.err.println("Error al obtener tratamientos de la mascota: " + e.getMessage());
         }
-
-        return listaTratamientos;
+        return lista;
     }
 }

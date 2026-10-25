@@ -1,132 +1,180 @@
-
 package org.vet.app;
 
+import org.vet.dao.ClienteDAO;
 import org.vet.dao.MascotaDAO;
 import org.vet.dao.TratamientoDAO;
+import org.vet.model.Cliente;
 import org.vet.model.Mascota;
 import org.vet.model.Tratamiento;
 import org.vet.util.ConexionBD;
-import org.vet.dao.ClienteDAO;
+import org.vet.service.FacturaService;
+import org.vet.util.FTPManager;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Formatter;
-import java.util.Locale;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) throws ParseException {
-
-
-        try (Connection conexion = ConexionBD.conectar()) {
-
-            System.out.println(
-                    "Conexion con la base de datos realizada correctamente."
-            );
-
+    public static void main(String[] args) {
+        try (Connection con = ConexionBD.conectar()) {
+            System.out.println("Conexion con la base de datos realizada correctamente.");
         } catch (SQLException e) {
-
             System.out.println("Error al conectar con la base de datos.");
             e.printStackTrace();
             return;
         }
 
         Scanner sc = new Scanner(System.in);
-        int eleccion = 0;
+        ClienteDAO clienteDAO = new ClienteDAO();
+        MascotaDAO mascotaDAO = new MascotaDAO();
+        TratamientoDAO tratamientoDAO = new TratamientoDAO();
 
-        System.out.println("-------------Bienvenido a VetCare---------------");
-        while (eleccion!=4) {
-            System.out.println("¿Que desea hacer?");
+        FTPManager ftpManager = new FTPManager("localhost", 21, "vetcare", "1234");
+
+        int eleccion = 0;
+        System.out.println("----------------- Bienvenido a VetCare -----------------");
+
+        while (eleccion != 5) {
+            System.out.println("\n¿Que desea hacer?");
             System.out.println("1. Registrar un cliente.");
             System.out.println("2. Registrar una mascota.");
             System.out.println("3. Registrar un tratamiento a una mascota.");
-            System.out.println("4.Cerrar VetCare.");
+            System.out.println("4. Consultar historial de tratamientos por mascota.");
+            System.out.println("5. Cerrar VetCare");
+            System.out.print("Opcion: ");
+
+            if (!sc.hasNextInt()) {
+                sc.next();
+                System.out.println("Por favor, introduce un numero valido.");
+                continue;
+            }
+
             eleccion = sc.nextInt();
+            sc.nextLine();
 
             if (eleccion == 1) {
-                ClienteDAO clienteDAO = new ClienteDAO();
-
-                System.out.println("\n=== VETCARE ===");
+                System.out.println("\n--- VETCARE ---");
                 System.out.println("Registro de cliente");
-
                 System.out.print("DNI: ");
-                String dni = sc.next();
-
+                String dni = sc.nextLine();
                 System.out.print("Nombre: ");
-                String nombre = sc.next();
-
+                String nombre = sc.nextLine();
                 System.out.print("Telefono: ");
-                String telefono = sc.next();
-
+                String telefono = sc.nextLine();
                 System.out.print("Email: ");
-                String email = sc.next();
+                String email = sc.nextLine();
 
-                clienteDAO.insertarCliente(dni, nombre, telefono, email);
-            }
+                Cliente nuevoCliente = new Cliente(dni, nombre, telefono, email);
+                clienteDAO.insertarCliente(nuevoCliente);
+                System.out.println("Cliente registrado correctamente.");
 
-            if (eleccion ==2){
-                MascotaDAO mascotaDAO = new MascotaDAO();
+            } else if (eleccion == 2) {
+                System.out.println("\n--- VETCARE ---");
+                System.out.println("Registro de mascota");
+                System.out.print("Nombre: ");
+                String nombre = sc.nextLine();
+                System.out.print("Especie: ");
+                String especie = sc.nextLine();
+                System.out.print("Raza: ");
+                String raza = sc.nextLine();
+                System.out.print("Fecha de nacimiento (AAAA-MM-DD): ");
+                String fechaStr = sc.nextLine();
+                System.out.print("ID del cliente propietario: ");
+                int idCliente = sc.nextInt();
+                sc.nextLine();
 
-                System.out.println("Nombre: ");
-                String nombre = sc.next();
+                Mascota nuevaMascota = new Mascota(nombre, especie, raza, Date.valueOf(fechaStr), idCliente);
+                mascotaDAO.insertarMascota(nuevaMascota);
+                System.out.println("Mascota registrada correctamente.");
 
-                System.out.println("Especie: ");
-                String especie = sc.next();
+            } else if (eleccion == 3) {
+                System.out.println("\n--- VETCARE ---");
+                System.out.println("Registro de tratamiento");
+                System.out.print("ID de la mascota: ");
+                int idMascota = sc.nextInt();
+                sc.nextLine();
+                System.out.print("Descripcion del tratamiento: ");
+                String descripcion = sc.nextLine();
+                System.out.print("Coste: ");
+                double coste = sc.nextDouble();
+                sc.nextLine();
 
-                System.out.println("Raza: ");
-                String raza = sc.next();
+                Date fechaActual = new Date(System.currentTimeMillis());
+                Tratamiento nuevoTratamiento = new Tratamiento(fechaActual, descripcion, coste, idMascota);
 
-                System.out.println("Fecha de nacimiento (formato DD/MM/YYYY): ");
-                String fechaNacimiento = sc.next();
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-                format.setLenient(false);
-                Date fecha = (Date) format.parse(fechaNacimiento);
+                int idTratamiento = tratamientoDAO.insertarTratamiento(nuevoTratamiento);
+                nuevoTratamiento.setId(idTratamiento);
+                System.out.println("Tratamiento registrado con ID: " + idTratamiento);
 
-                System.out.println("Id del cliente: ");
-                int nombreCliente = sc.nextInt();
+                // Obtener datos para la factura
+                Mascota mascota = mascotaDAO.obtenerMascotaPorId(idMascota);
+                if (mascota != null) {
+                    Cliente cliente = clienteDAO.obtenerClientePorId(mascota.getIdCliente());
+                    if (cliente != null) {
+                        try {
+                            File facturaLocal = FacturaService.generarFacturaTxt(nuevoTratamiento, mascota, cliente);
+                            System.out.println("\n[ACDA] Factura generada: " + facturaLocal.getName());
 
-                Mascota mascota = new Mascota(nombre, especie, raza, fecha, nombreCliente);
+                            // Subida programática al servidor FTP
+                            String carpetaRemota = "facturas";
+                            boolean subidaCorrecta = ftpManager.subirFactura(facturaLocal, carpetaRemota);
 
-                mascotaDAO.insertarMascota(mascota);
-            }
+                            if (subidaCorrecta) {
+                                System.out.println("[PSEP] Factura subida al servidor FTP correctamente.");
 
-            if (eleccion == 3){
+                                File archivoDescargado = new File("descargada_" + facturaLocal.getName());
+                                boolean descargaCorrecta = ftpManager.descargarFactura(facturaLocal.getName(), carpetaRemota, archivoDescargado);
 
-                TratamientoDAO tratamientoDAO = new TratamientoDAO();
+                                if (descargaCorrecta) {
+                                    System.out.println("[PSEP] Factura descargada del servidor para verificacion.");
+                                    boolean integra = ftpManager.verificarIntegridad(facturaLocal, archivoDescargado);
 
-                System.out.println("Fecha del tratamiento (formato DD/MM/YYYY): ");
-                String fecha = sc.next();
-                SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-                format.setLenient(false);
-                Date fechaTratamiento = (Date) format.parse(fecha);
+                                    if (integra) {
+                                        System.out.println("[PSEP] Verificacion de integridad: EXITOSA (tamaños y contenidos coinciden).");
+                                    } else {
+                                        System.out.println("[PSEP] Alerta: La factura descargada difiere del archivo original.");
+                                    }
+                                } else {
+                                    System.out.println("[PSEP] Error al descargar la factura del FTP.");
+                                }
+                            } else {
+                                System.out.println("[PSEP] Error al subir la factura al FTP.");
+                            }
+                        } catch (IOException e) {
+                            System.out.println("Error en la gestion de ficheros de la factura: " + e.getMessage());
+                        }
+                    }
+                }
 
-                System.out.println("Descripción: ");
-                String descripcion = sc.next();
+            } else if (eleccion == 4) {
+                System.out.println("\n--- VETCARE ---");
+                System.out.print("Introduce el ID de la mascota a consultar: ");
+                int idMascota = sc.nextInt();
+                sc.nextLine();
 
-                System.out.println("Coste: ");
-                int coste = sc.nextInt();
+                List<Tratamiento> tratamientos = tratamientoDAO.obtenerTratamientosPorMascota(idMascota);
+                if (tratamientos == null || tratamientos.isEmpty()) {
+                    System.out.println("No hay tratamientos registrados para la mascota con ID " + idMascota);
+                } else {
+                    System.out.println("\n--- Historial de Tratamientos (Mascota ID: " + idMascota + ") ---");
+                    for (Tratamiento t : tratamientos) {
+                        System.out.printf("ID: %d | Fecha: %s | Coste: %.2f EUR | Descripcion: %s%n",
+                                t.getId(), t.getFecha(), t.getCoste(), t.getDescripcion());
+                    }
+                }
 
-                System.out.println("Id de la mascota");
-                int idMasc = sc.nextInt();
-
-                Tratamiento tratamiento = new Tratamiento(fechaTratamiento, descripcion, coste, idMasc);
-                tratamientoDAO.registrarTratamiento(tratamiento);
-            }
-
-            if (eleccion == 4){
-                break;
-            }
-
-            if (eleccion < 0 || eleccion > 4){
-                System.out.println("Introduce un valor entre el 1 y el 4");
-                eleccion=0;
+            } else if (eleccion == 5) {
+                System.out.println("Cerrando la sesion de VetCare...");
+            } else {
+                System.out.println("Opcion no reconocida. Introduce un valor entre 1 y 5.");
             }
         }
+
         sc.close();
     }
 }
